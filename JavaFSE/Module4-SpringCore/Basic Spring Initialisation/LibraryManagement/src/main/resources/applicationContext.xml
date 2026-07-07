@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+               http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- ============================================================
+         EX6: Component scanning — Spring auto-detects @Service,
+         @Repository, @Component, @Aspect in the com.library package.
+         ============================================================ -->
+    <context:component-scan base-package="com.library" />
+
+    <!-- ============================================================
+         EX3 / EX8: Enable AspectJ auto-proxying so that Spring
+         applies @Aspect advice to matching beans automatically.
+         ============================================================ -->
+    <aop:aspectj-autoproxy />
+
+    <!-- ============================================================
+         EX5 / EX7: Explicit bean definitions (complement to scanning).
+         These demonstrate XML-based wiring for EX5 and EX7.
+         When component-scan is active AND explicit beans are defined,
+         Spring uses the explicit beans; qualifiers avoid conflicts.
+         ============================================================ -->
+
+    <!-- EX5 / EX7: BookRepository bean -->
+    <bean id="bookRepository" class="com.library.repository.BookRepository" />
+
+    <!-- EX7: BookService with BOTH constructor and setter injection.
+         Step 1 — Spring calls BookService(BookRepository) [constructor injection].
+         Step 2 — Spring then calls setBookRepository(...) [setter injection].
+         Both are wired to the same bookRepository bean to keep the demo simple. -->
+    <bean id="bookService" class="com.library.service.BookService">
+        <!-- Constructor injection (EX7) -->
+        <constructor-arg ref="bookRepository" />
+        <!-- Setter injection (EX2 / EX7) — overwrites the constructor-injected value -->
+        <property name="bookRepository" ref="bookRepository" />
+    </bean>
+
+    <!-- ============================================================
+         EX3 / EX8: Register the LoggingAspect bean.
+         @Aspect alone is not enough — the bean must exist in the
+         ApplicationContext for Spring AOP to create the proxy.
+         ============================================================ -->
+    <bean id="loggingAspect" class="com.library.aspect.LoggingAspect" />
+
+</beans>
